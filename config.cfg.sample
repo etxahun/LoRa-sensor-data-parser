@@ -1,0 +1,11 @@
+[MQTT]
+url	                    = <LoRa Network Server's Broker URl>
+port	                  = <MQTT Broker port>
+keepalive               = 60
+reconnect_delay_secs    = 2
+topic_id                = <Broker topic to subscribe>
+username	              = <MQTT Broker username>
+password		            = <MQTT Broker password>
+
+[LogFile]
+file                    = logs/output.log
