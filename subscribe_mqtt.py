@@ -6,6 +6,8 @@ import os
 import pprint
 import json
 import base64
+import csv
+from datetime import *
 
 ################################
 # Global Configuration          ###############################################
@@ -25,6 +27,8 @@ def loadConf():
     ret["topic_id"] = config.get('MQTT', 'topic_id')
     ret["username"] = config.get('MQTT', 'username')
     ret["password"] = config.get('MQTT', 'password')
+    ret["csv_file"] = config.get('CSV', 'filename')
+
     # Data Persistence configuration:
     # "Clean Session" Flag (CSF):
     #   Clean Session = True  (Default) ==> No Persistence activated
@@ -122,22 +126,51 @@ def on_message(client, userdata, msg):
                     }
     """
     data = json.loads(msg.payload)
+    # pprint.pprint(data) # Pretty Print
 
-    # Payload base64 encoded:
-    payload_encoded = data['data']
+    # Payload raw data (base64 encoded):
+    payload_raw = data['data']
 
     # Payload decoded to Hex:
-    payload_decoded = base64.b64decode(payload_encoded)
+    payload_hex = base64.b64decode(payload_raw)
 
-    # pprint.pprint(data) # Pretty Print
-    print(data["data"])
+    # Payload stored as byte string:
+    payload_hex = ":".join("{:02x}".format(ord(c)) for c in payload_hex)
+    # print("Payload split: " + str(payload_hex))
+
+    # Payload stored as list of bytes:
+    payload_decoded = payload_hex.split(":")
+    # print("Payload List: " + str(payload_decoded))
+
+    # People counter data extraction (second and third bytes):
+    counter_hex = payload_decoded[1] + payload_decoded[2]
+    counter_dec = int(counter_hex, 16)
+
     print("\nTopic: " + str(msg.topic) +
           "\nQoS: " + str(msg.qos) +
-          "\nPayload (base64): " + str(payload_encoded) +
-          "\nPayload (Hex): " + str(payload_decoded) + "\n")
+          "\nPayload (base64): " + str(payload_raw) +
+          "\nPayload (Hex): " + str(payload_decoded) +
+          "\nPeople Counter: " + str(counter_dec) + "\n")
+
+    save2csv(counter_dec)
+
+def save2csv(number):
+    """stored people counter data on CSV file.
+
+            CSV file format: TimeStamp, counter_value
+    """
+
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
+    with open(conf['csv_file'], 'a') as csvfile:
+        filewriter = csv.writer(csvfile, delimiter=',')
+        filewriter.writerow([timestamp, number])
+    csvfile.close()
+
 
 
 if __name__ == '__main__':
+    # Load general configuration:
     conf = loadConf()
 
     #-------------------------------

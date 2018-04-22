@@ -7,5 +7,5 @@ topic_id                = <Broker topic to subscribe>
 username	              = <MQTT Broker username>
 password		            = <MQTT Broker password>
 
-[LogFile]
-file                    = logs/output.log
+[CSV]
+filename	              = output/people_counter.csv
