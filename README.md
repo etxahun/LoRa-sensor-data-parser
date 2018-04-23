@@ -27,11 +27,11 @@ port	                = <MQTT Broker port>
 keepalive               = 60
 reconnect_delay_secs    = 2
 topic_id                = <Broker topic to subscribe>
-username	          = <MQTT Broker username>
-password		        = <MQTT Broker password>
+username	        = <MQTT Broker username>
+password		 = <MQTT Broker password>
 
 [CSV]
-filename	          = output/people_counter.csv
+filename	        = output/people_counter.csv
 ```
 
 ## Usage
