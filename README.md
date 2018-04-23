@@ -19,7 +19,7 @@ First of all install the required Python libraries for MQTT:
 
 The following tweaks are needed in order to make it work:
 
-1. Modify the "config.cfg" file according to your environment:
+1. Modify the "config.cfg.sample" file according to your environment and save it as "config.cfg" file name:
 ```shell
 [MQTT]
 url	                = <LoRa Network Server's Broker URl>
