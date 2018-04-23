@@ -22,16 +22,16 @@ The following tweaks are needed in order to make it work:
 1. Modify the "config.cfg" file according to your environment:
 ```shell
 [MQTT]
-url	                  = <LoRa Network Server's Broker URl>
+url	                = <LoRa Network Server's Broker URl>
 port	                = <MQTT Broker port>
 keepalive               = 60
 reconnect_delay_secs    = 2
 topic_id                = <Broker topic to subscribe>
-username	              = <MQTT Broker username>
-password		            = <MQTT Broker password>
+username	          = <MQTT Broker username>
+password		        = <MQTT Broker password>
 
 [CSV]
-filename	              = output/people_counter.csv
+filename	          = output/people_counter.csv
 ```
 
 ## Usage
