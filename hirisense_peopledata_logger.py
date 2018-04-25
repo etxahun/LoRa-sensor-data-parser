@@ -142,15 +142,19 @@ def on_message(client, userdata, msg):
     payload_decoded = payload_hex.split(":")
     # print("Payload List: " + str(payload_decoded))
 
-    # People counter data extraction (second and third bytes):
-    counter_hex = payload_decoded[1] + payload_decoded[2]
-    counter_dec = int(counter_hex, 16)
+    if payload_decoded[0] is not "0a":
+        print "No Data available!"
+        counter_desc = -1
+    else:
+        # People counter data extraction (second and third bytes):
+        counter_hex = payload_decoded[1] + payload_decoded[2]
+        counter_dec = int(counter_hex, 16)
 
-    print("\nTopic: " + str(msg.topic) +
-          "\nQoS: " + str(msg.qos) +
-          "\nPayload (base64): " + str(payload_raw) +
-          "\nPayload (Hex): " + str(payload_decoded) +
-          "\nPeople Counter: " + str(counter_dec) + "\n")
+        print("\nTopic: " + str(msg.topic) +
+              "\nQoS: " + str(msg.qos) +
+              "\nPayload (base64): " + str(payload_raw) +
+              "\nPayload (Hex): " + str(payload_decoded) +
+              "\nPeople Counter: " + str(counter_dec) + "\n")
 
     save2csv(counter_dec)
 
@@ -166,7 +170,6 @@ def save2csv(number):
         filewriter = csv.writer(csvfile, delimiter=',')
         filewriter.writerow([timestamp, number])
     csvfile.close()
-
 
 
 if __name__ == '__main__':
