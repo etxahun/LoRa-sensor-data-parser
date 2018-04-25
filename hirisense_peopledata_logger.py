@@ -142,6 +142,9 @@ def on_message(client, userdata, msg):
     payload_decoded = payload_hex.split(":")
     # print("Payload List: " + str(payload_decoded))
 
+    print "Primer Byte: " + str(payload_decoded[0])
+    print "Primer Byte Type: " + str(type(payload_decoded[0]))
+
     if payload_decoded[0] is not "0a":
         print "No Data available!"
         counter_desc = -1
@@ -156,7 +159,7 @@ def on_message(client, userdata, msg):
               "\nPayload (Hex): " + str(payload_decoded) +
               "\nPeople Counter: " + str(counter_dec) + "\n")
 
-    save2csv(counter_dec)
+        save2csv(counter_dec)
 
 def save2csv(number):
     """stored people counter data on CSV file.
