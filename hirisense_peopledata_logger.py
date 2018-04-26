@@ -33,7 +33,7 @@ def loadConf():
     # "Clean Session" Flag (CSF):
     #   Clean Session = True  (Default) ==> No Persistence activated
     #   Clean Session = False           ==> Persistence activated
-    ret["csf"] = False
+    ret["csf"] = True
 
     # QoS of Subscriber:
     #   QoS = 0 (Default) ==> "Fire and forget"
@@ -140,15 +140,11 @@ def on_message(client, userdata, msg):
 
     # Payload stored as list of bytes:
     payload_decoded = payload_hex.split(":")
-    # print("Payload List: " + str(payload_decoded))
+    print("Payload List: " + str(payload_decoded))
 
-    print "Primer Byte: " + str(payload_decoded[0])
-    print "Primer Byte Type: " + str(type(payload_decoded[0]))
+    print ("Primer Byte: " + str(payload_decoded[0]))
 
-    if payload_decoded[0] is not "0a":
-        print "No Data available!"
-        counter_desc = -1
-    else:
+    if payload_decoded[0] == "0a":
         # People counter data extraction (second and third bytes):
         counter_hex = payload_decoded[1] + payload_decoded[2]
         counter_dec = int(counter_hex, 16)
@@ -159,7 +155,11 @@ def on_message(client, userdata, msg):
               "\nPayload (Hex): " + str(payload_decoded) +
               "\nPeople Counter: " + str(counter_dec) + "\n")
 
-        save2csv(counter_dec)
+    else:
+        print "No Data available!"
+        counter_dec = -1
+
+    save2csv(counter_dec)
 
 def save2csv(number):
     """stored people counter data on CSV file.
@@ -169,8 +169,9 @@ def save2csv(number):
 
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
+    # headers=['timestamp', 'counter']
     with open(conf['csv_file'], 'a') as csvfile:
-        filewriter = csv.writer(csvfile, delimiter=',')
+        filewriter = csv.writer(csvfile, delimiter=',',lineterminator='\n')
         filewriter.writerow([timestamp, number])
     csvfile.close()
 
