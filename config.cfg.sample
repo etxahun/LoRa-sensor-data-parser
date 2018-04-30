@@ -9,3 +9,7 @@ password		            = <MQTT_password>
 
 [CSV]
 filename	              = <output_log_filename>
+
+[SIMULATOR]
+frequency               = 5
+
