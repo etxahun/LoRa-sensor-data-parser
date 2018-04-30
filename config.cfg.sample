@@ -4,6 +4,7 @@ port	                  = <MQTT_port>
 keepalive               = 60
 reconnect_delay_secs    = 2
 topic_id                = <MQTT_sensor_data_topic>
+sim_topic               = test
 username	              = <MQTT_username>
 password		            = <MQTT_password>
 
