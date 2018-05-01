@@ -128,27 +128,41 @@ def on_message(client, userdata, msg):
     data = json.loads(msg.payload)
     # pprint.pprint(data) # Pretty Print
 
-    # Payload raw data (base64 encoded):
+    # Step 1: Payload raw data (base64 encoded):
     payload_raw = data['data']
 
-    # Payload decoded to Hex:
+    # Step 2: Payload decoded Base64 to Hex:
     payload_hex = base64.b64decode(payload_raw)
+    # Resulting payload:
+    #   '\n\x00\x00\xdd\xff\xff \x00c'
 
-    # Payload stored as byte string:
+
+    # Step 2 (Alternative): If we want to decode in a more readable format:
+    # payload_hex = base64.b64decode(payload_raw).encode('hex')
+    # Resulting payload:
+    #  '0a0000ddffff200063'
+
+    # Step 3: Payload stored as byte string:
     payload_hex = ":".join("{:02x}".format(ord(c)) for c in payload_hex)
+    # Resulting payload::
+    #   '0a:00:00:dd:ff:ff:20:00:63'
     # print("Payload split: " + str(payload_hex))
 
-    # Payload stored as list of bytes:
+    # Step 4: Payload stored as list of bytes:
     payload_decoded = payload_hex.split(":")
-    print("Payload List: " + str(payload_decoded))
+    # print("Payload List: " + str(payload_decoded))
+    # print ("Primer Byte: " + str(payload_decoded[0]))
 
-    print ("Primer Byte: " + str(payload_decoded[0]))
+    # Step 4 (Alternative): Store data obtained in "Step 2 (Alternative)" as
+    # a list ob objects:
+    # payload_decoded = [payload_hex[i:i+2] for i in range(0, len(payload_hex), 2)]
 
     if payload_decoded[0] == "0a":
         # People counter data extraction (second and third bytes):
         counter_hex = payload_decoded[1] + payload_decoded[2]
         counter_dec = int(counter_hex, 16)
 
+        # Debug:
         print("\nTopic: " + str(msg.topic) +
               "\nQoS: " + str(msg.qos) +
               "\nPayload (base64): " + str(payload_raw) +
@@ -159,6 +173,7 @@ def on_message(client, userdata, msg):
         print "No Data available!"
         counter_dec = -1
 
+    # Save data to CSV file:
     save2csv(counter_dec)
 
 def save2csv(number):
@@ -200,44 +215,46 @@ if __name__ == '__main__':
     os.system('clear')
 
     # Connect to Broker and Publish
-    print("Connecting to broker " + str(conf["broker_address"]) + " ...")
+    print("Connecting to broker " + str(conf["broker_address"]) + "...")
     # Without Username/Password:
     # client.connect(broker_address, port)
 
     # With Username/Password:
     client.username_pw_set(conf["username"], conf["password"])
-    client.connect(conf["broker_address"], conf["broker_port"])
+    try:
+        client.connect(conf["broker_address"], conf["broker_port"])
+        #-------------------------------
+        # SUBSCRIBE                    |
+        #-------------------------------
+        #
+        # Subscribe Structure: subscribe(topic, qos=0)
+        client.subscribe(conf["topic_id"], conf["qos_sub"])
 
-    #-------------------------------
-    # SUBSCRIBE                    |
-    #-------------------------------
-    #
-    # Subscribe Structure: subscribe(topic, qos=0)
-    client.subscribe(conf["topic_id"], conf["qos_sub"])
 
+        # -------------------------------
+        # LOOPS                         |
+        #--------------------------------
+        #
+        # General Note: Strange behaviour when starting a loop before creating a
+        # connection.
+        #
+        # LOOP_START() | LOOP_STOP()
+        # --------------------------
+        #
+        # Description: The loop_start() starts a new thread, that calls the loop
+        # method at regular intervals for you. It also handles re-connects
+        # automatically.To stop the lopp "loop_stop()".
+        #
+        # client.loop_start()
 
-    # -------------------------------
-    # LOOPS                         |
-    #--------------------------------
-    #
-    # General Note: Strange behaviour when starting a loop before creating a
-    # connection.
-    #
-    # LOOP_START() | LOOP_STOP()
-    # --------------------------
-    #
-    # Description: The loop_start() starts a new thread, that calls the loop
-    # method at regular intervals for you. It also handles re-connects
-    # automatically.To stop the lopp "loop_stop()".
-    #
-    # client.loop_start()
-
-    # LOOP_FOREVER()
-    # --------------
-    #
-    # Description: "loop_forever()" is blocking, which means the client will
-    # continue to print out incoming message information until the program is
-    # killed. This method blocks the program, and is useful when the program must
-    # run indefinitely.
-    #
-    client.loop_forever()
+        # LOOP_FOREVER()
+        # --------------
+        #
+        # Description: "loop_forever()" is blocking, which means the client will
+        # continue to print out incoming message information until the program is
+        # killed. This method blocks the program, and is useful when the program must
+        # run indefinitely.
+        #
+        client.loop_forever()
+    except:
+        print("Connection Failed. Please check MQTT broker URL on 'config.cfg' file.")
