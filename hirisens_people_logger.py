@@ -3,6 +3,7 @@
 import paho.mqtt.client as mqtt
 import ConfigParser
 import os
+import platform
 import pprint
 import json
 import base64
@@ -212,7 +213,11 @@ if __name__ == '__main__':
     client.on_message = on_message
 
     # Clear Screen:
-    os.system('clear')
+    os_version = platform.system()
+    if os_version == 'Windows':
+        os.system('cls')
+    elif os_version in ('Linux', 'Darwin'):
+        os.version('clear')
 
     # Connect to Broker and Publish
     print("Connecting to broker " + str(conf["broker_address"]) + "...")

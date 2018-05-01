@@ -128,7 +128,11 @@ if __name__ == '__main__':
     client.on_publish = on_publish
 
     # Clear Screen:
-    os.system('clear')
+    os_version = platform.system()
+    if os_version == 'Windows':
+        os.system('cls')
+    elif os_version in ('Linux', 'Darwin'):
+        os.version('clear')
 
     # Connect to Broker and Publish
     print("Connecting to broker " + str(conf["broker_address"]) + "...")
