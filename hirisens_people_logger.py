@@ -186,7 +186,7 @@ def save2csv(number):
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     # headers=['timestamp', 'counter']
-    with open(conf['csv_file'], 'a') as csvfile:
+    with open(conf['csv_file'] + timestamp + '.csv', 'a') as csvfile:
         filewriter = csv.writer(csvfile, delimiter=',',lineterminator='\n')
         filewriter.writerow([timestamp, number])
     csvfile.close()
@@ -217,7 +217,7 @@ if __name__ == '__main__':
     if os_version == 'Windows':
         os.system('cls')
     elif os_version in ('Linux', 'Darwin'):
-        os.version('clear')
+        os.system('clear')
 
     # Connect to Broker and Publish
     print("Connecting to broker " + str(conf["broker_address"]) + "...")
