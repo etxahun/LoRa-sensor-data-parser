@@ -175,26 +175,30 @@ def on_message(client, userdata, msg):
         counter_dec = -1
 
     # Save data to CSV file:
-    save2csv(counter_dec)
+    save2csv(counter_dec, timestamp)
 
-def save2csv(number):
+def save2csv(number, timestamp):
     """stored people counter data on CSV file.
 
-            CSV file format: TimeStamp, counter_value
+        CSV file format: TimeStamp, counter_value
     """
 
-    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-
-    # headers=['timestamp', 'counter']
-    with open(conf['csv_file'] + timestamp + '.csv', 'a') as csvfile:
-        filewriter = csv.writer(csvfile, delimiter=',',lineterminator='\n')
-        filewriter.writerow([timestamp, number])
-    csvfile.close()
+    filewriter = csv.writer(csvfile, delimiter=',',lineterminator='\n')
+    filewriter.writerow([timestamp, number])
 
 
 if __name__ == '__main__':
     # Load general configuration:
     conf = loadConf()
+
+    # Current timestamp value:
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
+    # Open the CSV file to append the result:
+    try:
+        csvfile = open(conf['csv_file'] + timestamp + '.csv', 'a')
+    except IOError:
+        print('Something is wrong with the datafile!')
 
     #-------------------------------
     # MQTT Callback Functions      |

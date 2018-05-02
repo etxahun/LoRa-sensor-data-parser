@@ -133,7 +133,7 @@ if __name__ == '__main__':
     if os_version == 'Windows':
         os.system('cls')
     elif os_version in ('Linux', 'Darwin'):
-        os.version('clear')
+        os.system('clear')
 
     # Connect to Broker and Publish
     print("Connecting to broker " + str(conf["broker_address"]) + "...")
@@ -154,9 +154,9 @@ if __name__ == '__main__':
         # LOOP_START() | LOOP_STOP()
         # --------------------------
         #
-        # Description: The loop_start() starts a new thread, that calls the loop method
-        # at regular intervals for you. It also handles re-connects automatically. To
-        # stop the lopp "loop_stop()".
+        # Description: The loop_start() starts a new thread, that calls the
+        # loop method at regular intervals for you. It also handles re-connects
+        # automatically. To stop the lopp "loop_stop()".
         #
         client.loop_start()
 
@@ -164,9 +164,9 @@ if __name__ == '__main__':
         # --------------
         #
         # Description: "loop_forever()" is blocking, which means the client will
-        # continue to print out incoming message information until the program is
-        # killed. This method blocks the program, and is useful when the program must
-        # run indefinitely.
+        # continue to print out incoming message information until the program
+        # is killed. This method blocks the program, and is useful when the
+        # program must run indefinitely.
         #
         # client.loop_forever()
 
