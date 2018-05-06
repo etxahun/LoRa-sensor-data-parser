@@ -187,45 +187,55 @@ def save2csv(number):
         CSV file format: TimeStamp, counter_value
     """
 
-    global starttime, conta_min, conta_hora
+    global starttime, t_min, t_hora, conta_people_all, conta_people_hour, conta_people_day
 
     ts = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     # Registar on ' csv_all' file:
     filewriter = csv.writer(csvfile_all, delimiter=',',lineterminator='\n')
     filewriter.writerow([ts, number])
+    conta_people_all = conta_people_all + number
 
     # Check if a minute has passed:
     if minutePassed(starttime):
         filewriter = csv.writer(csvfile_min, delimiter=',',lineterminator='\n')
-        filewriter.writerow([ts, number])
-        conta_min += 1
+        filewriter.writerow([ts, conta_people_all])
+        t_min += 1
+        conta_people_hour = conta_people_hour + conta_people_all
+        conta_people_all = 0
         starttime = time.time()
 
     # Check if 60 minutes (60 values stored) have passed:
-    if conta_min == 60:
+    if t_min == 60:
         filewriter = csv.writer(csvfile_hour, delimiter=',',lineterminator='\n')
-        filewriter.writerow([ts, number])
+        filewriter.writerow([ts, conta_people_hour])
         # Reset the per minute counter:
-        conta_min = 0
-
+        t_min = 0
         # Increase the per hour counter:
-        conta_hora += 1
+        t_hora += 1
+        conta_people_day = conta_people_day + conta_people_hour
 
     # Check if 60 minutes (60 values stored) have passed:
-    if conta_hora == 24:
+    if t_hora == 24:
         filewriter = csv.writer(csvfile_day, delimiter=',',lineterminator='\n')
-        filewriter.writerow([ts, number])
+        filewriter.writerow([ts, conta_people_day])
         # Reset the per hour counter:
-        conta_hora = 0
+        t_hora = 0
+        conta_people_all = 0
+        conta_people_hour = 0
+        conta_people_day = 0
+
 
 def minutePassed(oldtime):
     """Checks if a minute has passed or not."""
     currenttime = time.time()
-    if currenttime - oldtime > 60:
+    if currenttime - oldtime >= 60:
+        print("TRUEEE")
         return True
     else:
+        print("FALSEE")
         return False
+
 
 if __name__ == '__main__':
     # Load general configuration:
@@ -234,9 +244,14 @@ if __name__ == '__main__':
     # Start Time:
     starttime = time.time()
 
-    # Counters:
-    conta_min = 0
-    conta_hora = 0
+    # Time Counters:
+    t_min = 0
+    t_hora = 0
+
+    # People Counters
+    conta_people_all = 0
+    conta_people_hour = 0
+    conta_people_day = 0
 
     # Current timestamp value:
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
