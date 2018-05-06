@@ -45,13 +45,13 @@ frequency               = 5
 
 Just run it as follows:
 
-The simulator:
+* The simulator:
 
 ``` shell
 $ python simulator.py
 ```
 
-The people counter logger:
+* The people counter logger:
 
 ``` shell
 $ python hirisens_people_logger.py
