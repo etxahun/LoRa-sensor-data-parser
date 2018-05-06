@@ -9,6 +9,7 @@ import json
 import base64
 import csv
 from datetime import *
+import time
 
 ################################
 # Global Configuration          ###############################################
@@ -28,7 +29,10 @@ def loadConf():
     ret["topic_id"] = config.get('MQTT', 'topic_id')
     ret["username"] = config.get('MQTT', 'username')
     ret["password"] = config.get('MQTT', 'password')
-    ret["csv_file"] = config.get('CSV', 'filename')
+    ret["csv_file_all"] = config.get('CSV', 'filename_all')
+    ret["csv_file_min"] = config.get('CSV', 'filename_min')
+    ret["csv_file_hour"] = config.get('CSV', 'filename_hour')
+    ret["csv_file_day"] = config.get('CSV', 'filename_day')
 
     # Data Persistence configuration:
     # "Clean Session" Flag (CSF):
@@ -96,17 +100,17 @@ def on_message(client, userdata, msg):
     'msg' structure:
                     {
                      "applicationID":"5",
-                     "applicationName":"Hirisens",
-                     "deviceName":"ConteoPersonas",
-                     "devEUI":"0004a30b0022889e",
+                     "applicationName":<application_name>,
+                     "deviceName":<device_name>,
+                     "devEUI":<devEUI>,
                      "rxInfo":[
                                 {
-                                 "mac":"7276ff002e062700",
+                                 "mac":<gateway_MAC>,
                                  "rssi":-59,
                                  "loRaSNR":8.5,
-                                 "name":"Kerlink_iBTS_GW1",
-                                 "latitude":28.0916,
-                                 "longitude":-17.1133,
+                                 "name":<gateway_name>,
+                                 "latitude":<latitude_value>,
+                                 "longitude":<longitude_value>,
                                  "altitude":0
                                  }
                               ],
@@ -175,28 +179,74 @@ def on_message(client, userdata, msg):
         counter_dec = -1
 
     # Save data to CSV file:
-    save2csv(counter_dec, timestamp)
+    save2csv(counter_dec)
 
-def save2csv(number, timestamp):
-    """stored people counter data on CSV file.
+def save2csv(number):
+    """Stores people counter data on CSV file.
 
         CSV file format: TimeStamp, counter_value
     """
 
-    filewriter = csv.writer(csvfile, delimiter=',',lineterminator='\n')
-    filewriter.writerow([timestamp, number])
+    global starttime, conta_min, conta_hora
 
+    ts = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
+    # Registar on ' csv_all' file:
+    filewriter = csv.writer(csvfile_all, delimiter=',',lineterminator='\n')
+    filewriter.writerow([ts, number])
+
+    # Check if a minute has passed:
+    if minutePassed(starttime):
+        filewriter = csv.writer(csvfile_min, delimiter=',',lineterminator='\n')
+        filewriter.writerow([ts, number])
+        conta_min += 1
+        starttime = time.time()
+
+    # Check if 60 minutes (60 values stored) have passed:
+    if conta_min == 60:
+        filewriter = csv.writer(csvfile_hour, delimiter=',',lineterminator='\n')
+        filewriter.writerow([ts, number])
+        # Reset the per minute counter:
+        conta_min = 0
+
+        # Increase the per hour counter:
+        conta_hora += 1
+
+    # Check if 60 minutes (60 values stored) have passed:
+    if conta_hora == 24:
+        filewriter = csv.writer(csvfile_day, delimiter=',',lineterminator='\n')
+        filewriter.writerow([ts, number])
+        # Reset the per hour counter:
+        conta_hora = 0
+
+def minutePassed(oldtime):
+    """Checks if a minute has passed or not."""
+    currenttime = time.time()
+    if currenttime - oldtime > 60:
+        return True
+    else:
+        return False
 
 if __name__ == '__main__':
     # Load general configuration:
     conf = loadConf()
+
+    # Start Time:
+    starttime = time.time()
+
+    # Counters:
+    conta_min = 0
+    conta_hora = 0
 
     # Current timestamp value:
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     # Open the CSV file to append the result:
     try:
-        csvfile = open(conf['csv_file'] + timestamp + '.csv', 'a')
+        csvfile_all = open(conf['csv_file_all'] + timestamp + '.csv', 'a')
+        csvfile_min = open(conf['csv_file_min'] + timestamp + '.csv', 'a')
+        csvfile_hour = open(conf['csv_file_hour'] + timestamp + '.csv', 'a')
+        csvfile_day = open(conf['csv_file_day'] + timestamp + '.csv', 'a')
     except IOError:
         print('Something is wrong with the datafile!')
 
@@ -238,7 +288,6 @@ if __name__ == '__main__':
         #
         # Subscribe Structure: subscribe(topic, qos=0)
         client.subscribe(conf["topic_id"], conf["qos_sub"])
-
 
         # -------------------------------
         # LOOPS                         |

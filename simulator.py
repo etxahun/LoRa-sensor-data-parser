@@ -29,7 +29,6 @@ def loadConf():
     ret["sim_topic"] = config.get('MQTT', 'sim_topic')
     ret["username"] = config.get('MQTT', 'username')
     ret["password"] = config.get('MQTT', 'password')
-    ret["csv_file"] = config.get('CSV', 'filename')
     ret["frequency"] = config.get('SIMULATOR', 'frequency')
 
     # Data Persistence configuration:

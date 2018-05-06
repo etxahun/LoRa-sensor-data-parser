@@ -1,5 +1,4 @@
 config.cfg
-people_counter.csv.bak
 00-generar_binario_windows.txt
 setup_simulator.py
 setup_hirisens.py
