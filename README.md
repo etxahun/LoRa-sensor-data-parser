@@ -23,22 +23,38 @@ The following tweaks are needed in order to make it work:
 ```shell
 [MQTT]
 url	                = <LoRa Network Server's Broker URl>
-port	                = <MQTT Broker port>
+port	                = <MQTT_port>
 keepalive               = 60
 reconnect_delay_secs    = 2
-topic_id                = <Broker topic to subscribe>
-username	        = <MQTT Broker username>
-password		= <MQTT Broker password>
+topic_id                = <MQTT_sensor_data_topic>
+sim_topic               = test
+username	        = <MQTT_username>
+password		= <MQTT_password>
 
 [CSV]
-filename	        = output/people_counter.csv
+filename_all            = <output_log_filename_all>
+filename_min            = <output_log_filename_min>
+filename_hour           = <output_log_filename_hour>
+filename_day            = <output_log_filename_day>
+
+[SIMULATOR]
+frequency               = 5
 ```
 
 ## Usage
 
 Just run it as follows:
+
+The simulator:
+
 ``` shell
-$ python subscribe_mqtt.py
+$ python simulator.py
+```
+
+The people counter logger:
+
+``` shell
+$ python hirisens_people_logger.py
 ```
 
 ## Contributing
